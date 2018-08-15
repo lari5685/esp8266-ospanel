@@ -1,7 +1,7 @@
 #include <ESP8266WiFi.h>
 
-const char* ssid     = "D-Link-3-8";
-const char* password = "639906710";
+const char* ssid     = "ssid";
+const char* password = "pass";
 
 const char* host = "192.168.0.106";
 
