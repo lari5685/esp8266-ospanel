@@ -4,7 +4,40 @@
 	<meta charset="UTF-8">
 	<title>SH</title>
 	<link rel="stylesheet" type="text/css" href="stile.css">
+	<script src="//code.jquery.com/jquery-1.11.0.min.js">
+  </script>
+  <script>  
+  function show()  
+  {  
+    
+    $.ajax({  
+    url: "data/temp-1.php",  
+    cache: false,  
+    success: function(html)
+      {  
+      $("#content").html(html); 
+      }
+    }); 
+
+    $.ajax({  
+    url: "data/hibr.php",  
+    cache: false,  
+    success: function(html)
+      {  
+      $("#content-1").html(html); 
+      }
+    }); 
+    
+             
+        }
+        
+        $(document).ready(function(){  
+            show();  
+            setInterval('show()',1000);  
+        }); 
+</script>
 </head>
+
 <body>
 	<div>
 		<form action="index.php" method="post">			
@@ -76,12 +109,12 @@
 		$ft = fopen('data/data_temp', 'r');
 		$t = fgets($ft, 99);
 		fclose($ft);
-
+		$temp = substr($t, 0, 5);
+		$hirb = substr($t, 6);
+		echo '<div> температура: <b id="content"></b>℃</div>';
+		echo '<div> влажность: <b id="content-1"></b>%</div>';
 
 	?>
-	</div>
-	<div>
-		
 	</div>
 </body>
 </html>
