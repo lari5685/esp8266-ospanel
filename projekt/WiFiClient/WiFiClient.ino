@@ -1,14 +1,17 @@
 #include <ESP8266WiFi.h>
+#include "DHT.h"
+#include <Adafruit_Sensor.h>
+const char* ssid     = "--------";
+const char* password = "--------";
+const char* host = "192.168.0.104";
 
-const char* ssid     = "ssid";
-const char* password = "pass";
-
-const char* host = "192.168.0.106";
-
+#define DHTPIN 2
 int r1=16,r2=5,r3=4,r4=0;
 
 
+  DHT dht(DHTPIN, DHT22);
 void setup() {
+  dht.begin();
   Serial.begin(115200);
   delay(10);
   pinMode(r1, OUTPUT);
@@ -40,7 +43,8 @@ void setup() {
 
 
 void loop() {
-  delay(1000);
+  float h = dht.readHumidity();
+  float t = dht.readTemperature();
 
   // Use WiFiClient class to create TCP connections
   WiFiClient client;
@@ -51,10 +55,11 @@ void loop() {
   }
 
   // We now create a URI for the request
-  String url = "/data/";
+  String url = " /data/";
   url += "input.php";
-  /*url += "?button=";
-  url += "rele_4_on";*/
+  url += "?temp=";
+  url += t;
+  url += h;
 
   ///test/index.php?button=rele_1_on
 
@@ -62,12 +67,12 @@ void loop() {
   Serial.println(url);
 
   // This will send the request to the server
-  client.print(String("GET ") + url + " HTTP/1.1\r\n" +
+  client.print(String("GET") + url + " HTTP/1.1\r\n" +
                "Host: " + host + "\r\n" +
                "Connection: close\r\n\r\n");
   unsigned long timeout = millis();
   while (client.available() == 0) {
-    if (millis() - timeout > 5000) {
+    if (millis() - timeout > 2000) {
       Serial.println(">>> Client Timeout !");
       client.stop();
       return;
@@ -77,12 +82,9 @@ void loop() {
   // Read all the lines of the reply from server and print them to Serial
   while (client.available()) {
     line = client.readStringUntil('\r');
-    Serial.println(line);
+    Serial.print(line);
   }
-  Serial.println(line[1]);
-  Serial.println(line[2]);
-  Serial.println(line[3]);
-  Serial.println(line[4]);
+  Serial.println();
   if(line[1] == '0') {digitalWrite(r1, HIGH);}
   else {digitalWrite(r1, LOW);}
   if(line[2] == '0') {digitalWrite(r2, HIGH);}
@@ -91,8 +93,6 @@ void loop() {
   else {digitalWrite(r3, LOW);}
   if(line[4] == '0') {digitalWrite(r4, HIGH);}
   else {digitalWrite(r4, LOW);}
-  Serial.println();
-  Serial.println("closing connection");
 
 }
 
